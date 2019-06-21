@@ -1,0 +1,30 @@
+﻿<head>
+    <title>Login</title>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+<br />
+<div class="row">
+    <div class="col-md-6 col-md-offset-3 boxStyle" style="padding-right: 0px!important;padding-left: 0px!important;">
+        <div class="panel-body" style="padding-right: 4px!important;padding-left: 4px!important;">
+            <form method="POST" action="" accept-charset="UTF-8">
+                <fieldset class="landscape_nomargin" style="min-width: 0;padding:    .35em .625em .75em!important;margin:0 2px;border: 2px solid #ffd800!important;margin-bottom: 10em;">
+                    <legend style="border-bottom: none;width: inherit;!important;padding:inherit; color: #ffd800;" class="legend">Please Sign In</legend>
+                    <div class="alert alert-error">
+                        <a class="close" data-dimiss="alert" href="#"></a>{{message}}
+                    </div>
+                    <input type="text" id="email" class="span4" name="email" placeholder="E-mail">
+                    <input type="password" id="password" class="span4" name="password" placeholder="Password">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember" value="1"> Remember Me
+                    </label>
+                    <button id="valuser" type="submit" onclick="location.href = '/';"
+                            class="btn btn-success">
+                        Submit
+                    </button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,6 +16,16 @@ from datetime import datetime
 from flask import render_template, Markup
 from FrontEnd import app
 from flask_mail import Mail, Message
+from flask_sqlalchemy import SQLAlchemy
+from flask_security import Security, SQLAlchemyUserDatastore,\
+    UserMixin, RoleMixin, login_required 
+
+app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'dev'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///F:/Project-GLAPS/FrontEnd/FrontEnd/glapsdb.sqlite'
+
+#create a secure db connection to be able to use flask security
+db2 = SQLAlchemy(app)
 
 mail = Mail(app)
 app.config.from_object(__name__)
@@ -28,7 +38,7 @@ app.config.update(
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
     MAIL_USERNAME = 'glapsproject@gmail.com',
-    MAIL_PASSWORD = 'PASSWORD HERE!!',
+    MAIL_PASSWORD = 'PA$$word13',
     DEFAULT_MAIL_SENDER = 'glapsproject@gmail.com'
     )
 
@@ -37,7 +47,30 @@ mail = Mail(app)
 
 # set the db key
 app.config.from_mapping(SECRET_KEY='dev',
-        DATABASE='/home/gmastorg/mysite2/glapsdb.sqlite')
+        DATABASE='glapsdb.sqlite')
+
+roles_users = db2.Table('roles_users', 
+                        db2.Column('user_id', db2.Integer(), db2.ForeignKey('user.id')),
+                        db2.Column('role_id', db2.Integer(), db2.ForeignKey('role.id')))
+
+class Role(db2.Model, RoleMixin):
+    id = db2.Column(db2.Integer(), primary_key=True)
+    name = db2.Column(db2.String(80), unique=True)
+    description = db2.Column(db2.String(255))
+
+class User(db2.Model, UserMixin):
+    id = db2.Column(db2.Integer, primary_key=True)
+    username = db2.Column(db2.String(255), unique=True)
+    email = db2.Column(db2.String(255), unique=True)
+    password = db2.Column(db2.String(255))
+    active = db2.Column(db2.Boolean())
+    confirmed_at = db2.Column(db2.DateTime())
+    roles = db2.relationship('Role', secondary=roles_users,
+                            backref=db2.backref('users', lazy='dynamic'))
+
+# Setup Flask-Security
+user_datastore = SQLAlchemyUserDatastore(db2, User, Role)
+security = Security(app, user_datastore)
 
 @app.route('/', methods=('GET', 'POST'))
 def home():
@@ -116,10 +149,11 @@ def load_logged_in_user():
 def logout():
 	"""Clear the current session, including the stored user id."""
 	session.clear()
-	return redirect(url_for('home'))
+	return redirect(url_for('/'))
 #end Region
 @app.route('/register', methods=('GET', 'POST'))
 def register():
+    error = ''
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
@@ -142,15 +176,17 @@ def register():
             error = 'Password is required.'
         elif db.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone() is not None:
             error = 'User {} is already registered.'.format(username)
+        elif db.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone() is not None:
+            error = 'Email {} is already registered.'.format(email)
 
         if error is None:
+            user_datastore.create_user(username=username, email=email, password=generate_password_hash(password))
+            db2.session.commit()
             db.execute('INSERT INTO users (username, email, password) VALUES (?,?,?)',(username, email, generate_password_hash(password)))
             db.commit()
             return redirect(url_for('login'))
 
-            flash(error)
-
-    return render_template('auth/register.html', title='Register', year=datetime.now().year)
+    return render_template('auth/register.html', title='Register', error=error, year=datetime.now().year)
 
 @app.route('/account', methods=["GET","POST"])
 def account():

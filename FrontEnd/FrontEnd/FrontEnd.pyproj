@@ -76,6 +76,7 @@
     <Folder Include="FrontEnd\templates\" />
     <Folder Include="FrontEnd\templates\auth\" />
     <Folder Include="FrontEnd\templates\errors\" />
+    <Folder Include="FrontEnd\templates\security\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FrontEnd\schema.sql" />
@@ -241,7 +242,7 @@
     <Content Include="FrontEnd\static\scripts\kreo\js\modernizr.js" />
     <Content Include="FrontEnd\templates\errors\404.html" />
     <Content Include="FrontEnd\templates\errors\500.html" />
-    <Content Include="FrontEnd\templates\auth\login.html" />
+    <Content Include="FrontEnd\templates\auth\login2.html" />
     <Content Include="FrontEnd\templates\auth\register.html" />
     <Content Include="FrontEnd\static\scripts\bootstrap.js" />
     <Content Include="FrontEnd\static\scripts\jquery-1.10.2.js" />
@@ -252,6 +253,7 @@
     <Content Include="FrontEnd\templates\layout.html" />
     <Content Include="FrontEnd\templates\comingsoon.html" />
     <Content Include="FrontEnd\templates\auth\account.html" />
+    <Content Include="FrontEnd\templates\security\login_user.html" />
     <Content Include="FrontEnd\templates\visualizations.html" />
     <Content Include="glapsdb.sqlite" />
     <Content Include="requirements.txt" />

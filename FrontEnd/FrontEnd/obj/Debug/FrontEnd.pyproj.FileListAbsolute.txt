@@ -1,3 +1,4 @@
 F:\GLAPS\FrontEnd\FrontEnd\obj\Debug\FrontEnd.pyproj.CoreCompileInputs.cache
 F:\Project-GLAPS\Project-GLAPS\GLAPS\FrontEnd\FrontEnd\obj\Debug\FrontEnd.pyproj.CoreCompileInputs.cache
 C:\Users\Kriina\Desktop\Project-GLAPS\FrontEnd\FrontEnd\obj\Debug\FrontEnd.pyproj.CoreCompileInputs.cache
+F:\Project-GLAPS\FrontEnd\FrontEnd\obj\Debug\FrontEnd.pyproj.CoreCompileInputs.cache
