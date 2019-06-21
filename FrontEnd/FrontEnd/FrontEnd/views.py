@@ -15,41 +15,81 @@ from FrontEnd.db import get_db
 from datetime import datetime
 from flask import render_template, Markup
 from FrontEnd import app
+from flask_mail import Mail, Message
 
-@app.route('/')
-@app.route('/home')
+mail = Mail(app)
+app.config.from_object(__name__)
+app.config.from_envvar('MINITWIT_SETTINGS', silent=True)
+app.config.update(
+    DEBUG = True,
+    # Flask-Mail Configuration
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'glapsproject@gmail.com',
+    MAIL_PASSWORD = 'PASSWORD HERE!!',
+    DEFAULT_MAIL_SENDER = 'glapsproject@gmail.com'
+    )
+
+# setup Mail
+mail = Mail(app)
+
+# set the db key
+app.config.from_mapping(SECRET_KEY='dev',
+        DATABASE='/home/gmastorg/mysite2/glapsdb.sqlite')
+
+@app.route('/', methods=('GET', 'POST'))
 def home():
-    load_logged_in_user()
-    """Renders the home page."""
-    return render_template('home.html',
-        title='Home Page',
-        year=datetime.now().year)
+        load_logged_in_user()
+        """Renders the home page."""
+        message = ''
+
+        if request.method =='POST':
+            name = str(request.form['contactName'])
+            subject = str(request.form['contactSubject'])
+            content = str(request.form['contactMessage'])
+            client = str(request.form['contactEmail'])
+            note = name+'\n'+subject+'\n'+content+'\n'+client
+            sender = "glapsproject@gmail.com"
+            recipient = "glapsproject@yahoo.com"
+
+            if note is not None and note != '':
+                msg = Message("Message From Contact Form", sender=sender, recipients=[recipient])
+                msg.body = note
+                mail.send(msg)
+                message = "Your message has been sent."
+                return render_template('home.html', title='Home Page', message = message,
+                year=datetime.now().year)
+
+        return render_template('home.html',
+            title='Home Page', message = message,
+            year=datetime.now().year)
+
 
 #Region - Log In information
 @app.route('/login', methods=('GET', 'POST'))
 def login():
 	"""Log in a registered user by adding the user id to the session."""
+	message = "Please login."
+
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		db = get_db()
-		error = None
 		user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
 
-		if user is None:
-			error = 'Incorrect username.'
-		elif not check_password_hash(user['password'], password):
-			error = 'Incorrect password.'
+		if username != "" and username is not None and password !="" and password is not None:
+		    if user is not None and check_password_hash(user['password'], password):
+		        session.clear()
+		        session['user_id'] = user['id']
+		        return redirect(url_for('home'))
+		    elif user is not None and check_password_hash(user['password'], password) is False:
+		        message = "Incorrect Username and/or Password."
+		        return render_template('auth/login.html', title='Login', message=message, year=datetime.now().year)
+		#flash(error)
 
-		if error is None:
-			# store the user id in a new session and return to the index
-			session.clear()
-			session['user_id'] = user['id']
-			return redirect(url_for('home'))
-
-		flash(error)
-
-	return render_template('auth/login.html', title='Login', year=datetime.now().year)
+	return render_template('auth/login.html', title='Login', message=message, year=datetime.now().year)
 
 def login_required(view):
 	"""View decorator that redirects anonymous users to the login page."""
@@ -76,7 +116,7 @@ def load_logged_in_user():
 def logout():
 	"""Clear the current session, including the stored user id."""
 	session.clear()
-	return redirect(url_for('comingsoon'))
+	return redirect(url_for('home'))
 #end Region
 @app.route('/register', methods=('GET', 'POST'))
 def register():
@@ -111,7 +151,7 @@ def register():
             flash(error)
 
     return render_template('auth/register.html', title='Register', year=datetime.now().year)
-	
+
 @app.route('/account', methods=["GET","POST"])
 def account():
     load_logged_in_user()
@@ -141,7 +181,6 @@ def comingsoon():
 app.config["DEBUG"] = True
 @app.route('/glaps', methods=["GET","POST"]) #this section is used for when the data bases are linked.
 def glaps():
-    load_logged_in_user()
     States_Counties = getState_CountiesList()
     valueError = ""
     countyError = ""
@@ -173,7 +212,7 @@ def glaps():
                     "<br><br>Current Home Value with a Stadium:   " + '<font color="limegreen">$' + actualWStad + '</font>' + \
                    "<br><br>Median Value of Homes in " + '<font color="yellow">' + County + '</font>' + " without a Stadium:   " + '<font color="limegreen">$' + medianNoStad + '</font>' + \
                    "<br><br>Median Value of Homes in " + '<font color="yellow">' + County + '</font>' + " with a Stadium:   " + '<font color="limegreen">$' + medianWStad + '</font>' + \
-                   "<br><br><br><small>The predicted values have a PERCENT margin of error and were calculated using data from the 2017 U.S. Census</small>")
+                   "<br><br><br><small>The predicted values have a .0008 Mean Squared Error and were calculated using data from the 2017 U.S. Census</small>")
 
                     return render_template('glaps.html',
                     title='Home Value Predictor',
@@ -187,7 +226,6 @@ def glaps():
         bytearray=datetime.now().year,
         message= 'Enter your location on the map and your current home value below:',
         countyError = countyError, valueError = valueError)
-    load_logged_in_user()
     States_Counties = getState_CountiesList()
     valueError = ""
     countyError = ""
@@ -218,7 +256,7 @@ def glaps():
                     "<br><br>Current Home Value with a Stadium:   " + '<font color="limegreen">$' + actualWStad + '</font>' + \
                    "<br><br>Median Value of Homes in " + '<font color="yellow">' + County + '</font>' + " without a Stadium:   " + '<font color="limegreen">$' + medianNoStad + '</font>' + \
                    "<br><br>Median Value of Homes in " + '<font color="yellow">' + County + '</font>' + " with a Stadium:   " + '<font color="limegreen">$' + medianWStad + '</font>' + \
-                   "<br><br><br><small>The predicted values have a PERCENT margin of error and were calculated using data from the 2017 U.S. Census</small>")
+                   "<br><br><br><small>The predicted values have a .0008 mean squared error and were calculated using data from the 2017 U.S. Census</small>")
 
                     return render_template('glaps.html',
                     title='Home Value Predictor',

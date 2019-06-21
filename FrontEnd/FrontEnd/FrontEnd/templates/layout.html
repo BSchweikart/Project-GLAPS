@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿.<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Project GLAPS</title>
@@ -38,10 +38,9 @@
                 </a>
                 <ul id="nav" class="nav">
                     <li><a href="{{ url_for('home') }}">Home.</a></li>
+                    <li><a href="{{ url_for('glaps') }}"><span class="glyphicon glyphicon-glaps"></span> Glaps.</a></li>
+                    <li><a href="{{ url_for('visualizations') }}"><span class="glyphicon glyphicon-visualizations"></span> Visualizations.</a></li>
                     {% if g.user %}
-                    <li><a href="{{ url_for('glaps') }}"><span class="glyphicon glyphicon-glaps"></span> Glaps</a></li>
-                    <li><a href="{{ url_for('visualizations') }}"><span class="glyphicon glyphicon-visualizations"></span> Visualizations</a></li>
-                    <li><a href="{{ url_for('facets') }}"><span class="glyphicon glyphicon-visualizations"></span> Facets</a></li>
                     <li><a href="{{ url_for('account') }}"><span class="glyphicon glyphicon-log-in"></span>{{ g.user['username'] }} </a></li>
                     <!--<li><span>{{ g.user['username'] }}</span>-->
                     <li>
@@ -55,7 +54,7 @@
             <ul class="header-social">
                 <li><a href="#"><i class="fa fa-facebook"></i></a></li>
                 <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                <li><a href="https://github.com/BSchweikart/Project-GLAPS/tree/master"><i class="fa fa-github"></i></a></li>
+                <li><a href="https://github.com/gmastorg/Project-GLAPS"><i class="fa fa-github"></i></a></li>
             </ul>
         </div>
     </header>
@@ -65,9 +64,11 @@
             <p>&copy; {{ year }} - Project GLAPS</p>
         </footer>
     </div>
+    <!-- not working
     <div id="preloader">
         <div id="loader"></div>
     </div>
+    -->
     <!-- Java Script
     ================================================== -->
     <script src="../static/scripts/kreo/js/jquery-1.11.3.min.js"></script>
