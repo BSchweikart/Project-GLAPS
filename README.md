@@ -19,6 +19,8 @@ www.glaps.live what is working for our final. The project is being turned over t
 # Authors
 - Brian Schweikart
 - Jesse Watts
+- Mallory Milstead
+- Gabriela Canjura
 
 # Institution
 Fayetteville Technical Community College
