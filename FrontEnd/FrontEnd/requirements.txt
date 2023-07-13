@@ -11,8 +11,8 @@ pip==21.1
 pluggy==0.8.1
 py==1.10.0
 pytest==4.3.0
-requests==2.21.0
+requests==2.31.0
 setuptools==40.8.0
 six==1.12.0
 Werkzeug==2.2.3
-requests==2.21.0
+requests==2.31.0
